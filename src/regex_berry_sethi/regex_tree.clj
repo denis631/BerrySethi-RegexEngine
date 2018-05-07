@@ -3,15 +3,15 @@
 
 ;; empty
 (defmulti empty? ::regex-tree)
-(defmethod empty? ::epsilon [e] true)
-(defmethod empty? ::letter [l] false)
+(defmethod empty? ::epsilon [_] true)
+(defmethod empty? ::letter [_] false)
 (defmethod empty? ::or [o] (or (empty? (:left o)) (empty? (:right o))))
-(defmethod empty? ::star [s] true)
+(defmethod empty? ::star [_] true)
 (defmethod empty? ::concat [c] (and (empty? (:left c)) (empty? (:right c))))
 
 ;; first
 (defmulti first ::regex-tree)
-(defmethod first ::epsilon [e] [])
+(defmethod first ::epsilon [_] [])
 (defmethod first ::letter [l] [l])
 (defmethod first ::or [o] (concat (first (:left o)) (first (:right o))))
 (defmethod first ::star [s] (first (:r s)))
@@ -38,17 +38,19 @@
 
 ;; last
 (defmulti last ::regex-tree)
-(defmethod last ::epsilon [e] [])
+(defmethod last ::epsilon [_] [])
 (defmethod last ::letter [l] [l])
 (defmethod last ::or [o] (concat (last (:left o)) (last (:right o))))
 (defmethod last ::star [s] (last (:r s)))
 (defmethod last ::concat [c] (if (empty? (:right c))
                                 (concat (last (:left c)) (last (:right c)))
-                                (last (:left c))))
+                                (last (:right c))))
+
+(defn uuid [] (str (java.util.UUID/randomUUID)))
 
 ;; constructors
-(defn epsilon [] {::regex-tree ::epsilon})
-(defn letter [l] {::regex-tree ::letter :letter l})
-(defn or [l r] {::regex-tree ::or :left l :right r})
-(defn star [s] {::regex-tree ::star :r s})
-(defn concat [l r] {::regex-tree ::concat :left l :right r})
+(defn epsilon [] {::regex-tree ::epsilon ::id (uuid)})
+(defn letter [l] {::regex-tree ::letter ::id (uuid) :letter l})
+(defn or [l r] {::regex-tree ::or ::id (uuid) :left l :right r})
+(defn star [s] {::regex-tree ::star ::id (uuid) :r s})
+(defn concat [l r] {::regex-tree ::concat ::id (uuid) :left l :right r})

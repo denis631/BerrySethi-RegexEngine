@@ -11,6 +11,6 @@
               (regex-tree/or (regex-tree/letter \a) (regex-tree/letter \b)))))
 
 (defn -main
-  "I don't do a whole lot ... yet."
   [& args]
-  (println (automaton/accepts? tree "abab")))
+  (println (automaton/accepts? tree "abab"))
+  (println (automaton/graphviz tree "ababb")))
