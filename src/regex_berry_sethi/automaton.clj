@@ -12,7 +12,7 @@
 
 (defn accepting-states
   [automaton]
-  (let [accepting-states (into [] (regex-tree/last automaton))]
+  (let [accepting-states (vec (regex-tree/last automaton))]
     (if (regex-tree/empty? automaton)
       (conj accepting-states :init)
       accepting-states)))
@@ -34,9 +34,9 @@
                                   [:init]
                                   word)]
 
-    ;; check if any state we landed is an accepting state of this automaton
-    (not-empty? (some (into #{} word-final-states)
-                      (accepting-states automaton)))))
+    ;; check if any state we landed is an accepting state of this automaton (not-nil)
+    (some? (some (into #{} word-final-states)
+                 (accepting-states automaton)))))
 
 ;; Graphviz
 ;;---------
@@ -54,7 +54,6 @@
 (defn graphviz
   "generates graphviz representation of the dfa constructed while consuming given word"
   [automaton word]
-  ;; init work
   (let [leaf-ids (state-ids automaton)
         traversed-states (->> (reduce (fn [states-till-char char]
                                         (cons (mapcat #(transition automaton % char)
